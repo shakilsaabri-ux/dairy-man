@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Buffalo Herd Book</title>
+    <!-- Tailwind CSS for clean iPhone UI styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Native-looking Mobile Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 4rem); }
+        .badge-pregnant { background-color: #def7ec; color: #03543f; }
+        .badge-khali { background-color: #e1effe; color: #1e429f; }
+        .badge-returned { background-color: #fde8e8; color: #9b1c1c; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+
+    <!-- TOP HEADER -->
+    <header class="bg-gradient-to-r from-amber-800 to-amber-950 text-white px-4 pt-6 pb-4 sticky top-0 z-50 shadow-md">
+        <div class="flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-tight flex items-center gap-2">
+                <i class="fa-solid font-black fa-cow text-amber-400"></i> Buffalo Herd Book
+            </h1>
+            <span class="bg-amber-700/50 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm" id="header-count">0 Buffaloes</span>
+        </div>
+    </header>
+
+    <!-- MAIN VIEWS CONTAINER -->
+    <main class="p-4 safe-bottom">
+        
+        <!-- 1. DASHBOARD VIEW -->
+        <section id="view-dashboard" class="space-y-4">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-amber-700"></i> Farm Overview Dashboard
+            </h2>
+
+            <!-- Metrics Grid -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 font-medium">Total Herd Size</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1" id="dash-total-herd">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 font-medium">Pregnant (>7 Months)</p>
+                    <p class="text-2xl font-bold text-emerald-600 mt-1" id="dash-pregnant-7m">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 font-medium">Fali Due for Dr. Test</p>
+                    <p class="text-2xl font-bold text-blue-600 mt-1" id="dash-due-test">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 font-medium">Due for Birth (10 Mo)</p>
+                    <p class="text-2xl font-bold text-purple-600 mt-1" id="dash-due-birth">0</p>
+                </div>
+            </div>
+
+            <!-- Urgent Critical Alerts Dashboard (Yellow Highlights) -->
+            <div id="dashboard-critical-alerts" class="hidden space-y-2">
+                <h3 class="text-xs font-bold text-amber-800 tracking-wider uppercase mt-2">⚠️ Attention Required</h3>
+                <div id="alerts-list" class="space-y-2"></div>
+            </div>
+
+            <!-- Shed & Khila Capacities -->
+            <h3 class="text-xs font-bold text-gray-500 tracking-wider uppercase mt-4">Shed Capacity Tracker</h3>
+            <div class="space-y-3">
+                <!-- Shed 8/1 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between text-sm font-semibold mb-1">
+                        <span>Shed 8/1 (Main + Yard)</span>
+                        <span id="shed-1-status">0 / 113 Khilas</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="shed-1-bar" class="bg-amber-700 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p class="text-[11px] text-gray-500 mt-1.5" id="shed-1-sub">0 Buffaloes | 0 Bulls | Yard: 0/15</p>
+                </div>
+                <!-- Shed 8/2 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between text-sm font-semibold mb-1">
+                        <span>Shed 8/2 (Main + Yard)</span>
+                        <span id="shed-2-status">0 / 110 Khilas</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="shed-2-bar" class="bg-amber-700 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p class="text-[11px] text-gray-500 mt-1.5" id="shed-2-sub">0 Buffaloes | 0 Bulls | Yard: 0/12</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. HERD BOOK LIST VIEW -->
+        <section id="view-records" class="hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold text-gray-900">Herd Registry</h2>
+                <span class="text-xs text-gray-500 font-medium" id="record-count">Showing 0 rows</span>
+            </div>
+            <div id="herd-list-container" class="space-y-3">
+                <!-- Cards injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- 3. SCANNER / ADD RECORD VIEW -->
+        <section id="view-scan" class="hidden space-y-4">
+            <h2 class="text-lg font-bold text-gray-900">Add Buffalo / Auto-Scan</h2>
+            
+            <!-- Simulated Live Camera Canvas Module -->
+            <div class="bg-black rounded-2xl overflow-hidden relative aspect-video shadow-inner flex flex-col justify-center items-center text-white border-2 border-dashed border-gray-600">
+                <div id="camera-idle" class="text-center p-4">
+                    <i class="fa-solid fa-camera text-4xl text-amber-500 mb-2"></i>
+                    <p class="text-sm font-medium">Scan Handwritten Logs or Receipts</p>
+                    <p class="text-xs text-gray-400 mt-1">Uses smart OCR simulation for mobile layout template</p>
+                    <button onclick="triggerSimulatedScan()" class="mt-3 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">
+                        Simulate Camera Capture
+                    </button>
+                </div>
+                <div id="camera-scanning" class="hidden text-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500 mx-auto mb-2"></div>
+                    <p class="text-xs tracking-widest uppercase text-amber-400">Analyzing Handwriting Log...</p>
+                </div>
+            </div>
+
+            <!-- Interactive Entry Form -->
+            <form id="buffalo-form" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+                <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-1">Buffalo Parameter Profile</h3>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Bhais Tag No *</label>
+                        <input type="text" id="form-tag" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Khila No</label>
+                        <input type="text" id="form-khila" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Incoming Date *</label>
+                        <input type="date" id="form-incoming" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Fali Date</label>
+                        <input type="date" id="form-fali" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Shed Assignment *</label>
+                        <select id="form-shed" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600">
+                            <option value="8/1 Main">Shed 8/1 Main</option>
+                            <option value="8/1 Yard">Shed 8/1 Yard</option>
+                            <option value="8/2 Main">Shed 8/2 Main</option>
+                            <option value="8/2 Yard">Shed 8/2 Yard</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Animal Classification</label>
+                        <select id="form-type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600">
+                            <option value="Buffalo">Buffalo</option>
+                            <option value="Bull">Bull</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Bull Name / No</label>
+                        <input type="text" id="form-bull" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Pregnancy Status</label>
+                        <select id="form-status" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600">
+                            <option value="Khali">Khali (Empty)</option>
+                            <option value="Pregnant">Pregnant</option>
+                            <option value="Returned">Returned</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr class="border-gray-100 my-2">
+                <h4 class="text-xs font-bold text-amber-800 tracking-wider uppercase">Palak Logistics & Locations</h4>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-semibold text-gray-500 mb-1">Caretaker</label>
+                        <select id="form-palak" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-1.5 text-xs focus:outline-none">
+                            <option value="None">None</option>
+                            <option value="Tosif">Tosif (₹3100)</option>
+                            <option value="Noora">Noora (₹3300)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-gray-500 mb-1">Out (To Guj)</label>
+                        <input type="date" id="form-out" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-1.5 text-xs focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-gray-500 mb-1">In (To Mum)</label>
+                        <input type="date" id="form-return" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-1.5 text-xs focus:outline-none">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-amber-800 hover:bg-amber-900 text-white font-bold py-3 rounded-xl text-sm transition mt-2 shadow">
+                    Save Record to Book
+                </button>
+            </form>
+        </section>
+
+        <!-- 4. PALAK BILLING VIEW -->
+        <section id="view-billing" class="hidden space-y-4">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <i class="fa-solid fa-indian-rupee-sign text-emerald-700"></i> Palak Invoicing Dashboard
+            </h2>
+            <p class="text-xs text-gray-500">Charges apply strictly for tracking parameters inside Mumbai upon return from Gujarat. Time standing in Gujarat is zero-cost.</p>
+
+            <!-- Summaries -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-gradient-to-br from-teal-50 to-teal-100/50 p-4 rounded-2xl border border-teal-100">
+                    <p class="text-xs font-bold text-teal-800 uppercase tracking-wider">Tosif Summary</p>
+                    <p class="text-xl font-black text-teal-900 mt-1" id="bill-tosif-total">₹0</p>
+                    <p class="text-[10px] text-teal-700 mt-0.5" id="bill-tosif-count">0 Buffaloes Returned</p>
+                </div>
+                <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-4 rounded-2xl border border-emerald-100">
+                    <p class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Noora Summary</p>
+                    <p class="text-xl font-black text-emerald-900 mt-1" id="bill-noora-total">₹0</p>
+                    <p class="text-[10px] text-emerald-700 mt-0.5" id="bill-noora-count">0 Buffaloes Returned</p>
+                </div>
+            </div>
+
+            <!-- Detailed Statement Invoices -->
+            <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase mt-4">Active Statement Ledgers</h3>
+            <div id="billing-list-container" class="space-y-3">
+                <!-- Calculated ledger entries injected here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- NATIVE IPHONE STYLE BOTTOM NAVIGATION BAR -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-xl px-2 py-1 flex justify-around items-center z-50 backdrop-blur-md bg-white/90">
+        <button onclick="switchView('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 py-1 text-amber-800 font-bold">
+            <i class="fa-solid fa-chart-pie text-lg"></i>
+            <span class="text-[10px] mt-0.5">Dashboard</span>
+        </button>
+        <button onclick="switchView('records')" id="nav-records" class="flex flex-col items-center justify-center flex-1 py-1 text-gray-400">
+            <i class="fa-solid fa-list text-lg"></i>
+            <span class="text-[10px] mt-0.5">Herd Book</span>
+        </button>
+        <button onclick="switchView('scan')" id="nav-scan" class="flex flex-col items-center justify-center flex-1 py-1 text-gray-400">
+            <i class="fa-solid fa-circle-plus text-lg text-amber-700"></i>
+            <span class="text-[10px] mt-0.5">Add / Scan</span>
+        </button>
+        <button onclick="switchView('billing')" id="nav-billing" class="flex flex-col items-center justify-center flex-1 py-1 text-gray-400">
+            <i class="fa-solid fa-receipt text-lg"></i>
+            <span class="text-[10px] mt-0.5">Palak Bills</span>
+        </button>
+    </nav>
+
+    <!-- AUTOMATION CONTROLLER SCRIPTS -->
+    <script>
+        // Reactive In-Memory State synced with localStorage
+        let herd = JSON.parse(localStorage.getItem('buffalo_herd_book')) || [
+            { id: 1, tag: "101", khila: "5", incoming: "2026-01-01", fali: "2026-01-15", shed: "8/1 Main", type: "Buffalo", bull: "Sultan", status: "Pregnant", palak: "None", outDate: "", returnDate: "" },
+            { id: 2, tag: "102", khila: "12", incoming: "2026-01-10", fali: "", shed: "8/2 Main", type: "Buffalo", bull: "", status: "Khali", palak: "None", outDate: "", returnDate: "" },
+            { id: 3, tag: "103", khila: "44", incoming: "2026-02-01", fali: "2026-02-05", shed: "8/1 Yard", type: "Buffalo", bull: "Raja", status: "Returned", palak: "Tosif", outDate: "2026-04-01", returnDate: "2026-05-01" },
+            { id: 4, tag: "104", khila: "B-1", incoming: "2026-01-01", fali: "", shed: "8/1 Main", type: "Bull", bull: "Self", status: "Khali", palak: "None", outDate: "", returnDate: "" }
+        ];
+
+        // System Constants
+        const MONTHLY_RATES = { Tosif: 3100, Noora: 3300 };
+        const SHED_CAPACITIES = {
+            "8/1": { mainMax: 98, buffaloTarget: 96, bullTarget: 2, yardMax: 15 },
+            "8/2": { mainMax: 98, buffaloTarget: 96, bullTarget: 2, yardMax: 12 }
+        };
+
+        // Date Calculations Helpers
+        function getDaysBetween(d1, d2) {
+            if (!d1 || !d2) return 0;
+            const diffTime = Math.abs(new Date(d2) - new Date(d1));
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        function getDaysAgo(dateStr) {
+            if (!dateStr) return 0;
+            const diffTime = (new Date() - new Date(dateStr));
+            return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        // Tab Navigation View Management Switcher
+        function switchView(viewName) {
+            ['dashboard', 'records', 'scan', 'billing'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+                document.getElementById(`nav-${v}`).classList.remove('text-amber-800', 'font-bold');
+                document.getElementById(`nav-${v}`).classList.add('text-gray-400');
+            });
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            document.getElementById(`nav-${viewName}`).classList.add('text-amber-800', 'font-bold');
+            document.getElementById(`nav-${viewName}`).classList.remove('text-gray-400');
+            renderApp();
+        }
+
+        // Simulated OCR Processing Pipeline Trigger
+        function triggerSimulatedScan() {
+            document.getElementById('camera-idle').classList.add('hidden');
+            document.getElementById('camera-scanning').classList.remove('hidden');
+            
+            setTimeout(() => {
+                // Mimic handwritten capture receipt extraction values
+                const randomTag = Math.floor(Math.random() * 800) + 200;
+                document.getElementById('form-tag').value = randomTag;
+                document.getElementById('form-khila').value = Math.floor(Math.random() * 90) + 1;
+                document.getElementById('form-incoming').value = new Date().toISOString().split('T')[0];
+                document.getElementById('form-shed').value = "8/1 Main";
+                document.getElementById('form-status').value = "Khali";
+                
+                document.getElementById('camera-idle').classList.remove('hidden');
+                document.getElementById('camera-scanning').classList.add('hidden');
+                alert(`OCR Scan Complete!\nLoaded Auto-Detected Buffalo Tag #${randomTag} from document.`);
+            }, 1800);
+        }
+
+        // Form Submission Pipeline Handler
+        document.getElementById('buffalo-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const record = {
+                id: Date.now(),
+                tag: document.getElementById('form-tag').value,
+                khila: document.getElementById('form-khila').value,
+                incoming: document.getElementById('form-incoming').value,
+                fali: document.getElementById('form-fali').value,
+                shed: document.getElementById('form-shed').value,
+                type: document.getElementById('form-type').value,
+                bull: document.getElementById('form-bull').value,
+                status: document.getElementById('form-status').value,
+                palak: document.getElementById('form-palak').value,
+                outDate: document.getElementById('form-out').value,
+                returnDate: document.getElementById('form-return').value
+            };
+            
+            herd.push(record);
+            localStorage.setItem('buffalo_herd_book', JSON.stringify(herd));
+            this.reset();
+            alert("Record successfully committed to ledger!");
+            switchView('dashboard');
+        });
+
+        // Record Deletion Utility
+        function deleteRecord(id) {
+            if(confirm("Confirm removal of this buffalo from register?")) {
+                herd = herd.filter(item => item.id !== id);
+                localStorage.setItem('buffalo_herd_book', JSON.stringify(herd));
+                renderApp();
+            }
+        }
+
+        // Master Application Aggregation Render Engine
+        function renderApp() {
+            // Totals Counters Initializations
+            let totalBuffaloes = 0;
+            let totalBulls = 0;
+            let pregnantOver7M = 0;
+            let dueForTest = 0;
+            let dueForBirth = 0;
+
+            let shed1MainBuff = 0, shed1MainBulls = 0, shed1Yard = 0;
+            let shed2MainBuff = 0, shed2MainBulls = 0, shed2Yard = 0;
+            
+            let tosifTotalBill = 0, tosifCount = 0;
+            let nooraTotalBill = 0, nooraCount = 0;
+
+            let alertsHTML = "";
+            let recordsHTML = "";
+            let billingHTML = "";
+
+            // Loop and process individual items
+            herd.forEach(b => {
+                if (b.type === 'Bull') totalBulls++;
+                else totalBuffaloes++;
+
+                // Shed Distributions Metrics
+                if(b.shed === "8/1 Main") { if(b.type==='Bull') shed1MainBulls++; else shed1MainBuff++; }
+                else if(b.shed === "8/1 Yard") shed1Yard++;
+                else if(b.shed === "8/2 Main") { if(b.type==='Bull') shed2MainBulls++; else shed2MainBuff++; }
+                else if(b.shed === "8/2 Yard") shed2Yard++;
+
+                // Automated Metric Evaluators base timelines
+                const daysSinceIncoming = getDaysAgo(b.incoming);
+                const daysSinceFali = b.fali ? getDaysAgo(b.fali) : null;
+
+                // 100 days unserviced alert condition tracking check
+                let alertUnserviced = false;
+                if (!b.fali && daysSinceIncoming > 100 && b.type !== 'Bull') {
+                    alertUnserviced = true;
+                    alertsHTML += `<div class="bg-amber-100 border-l-4 border-amber-500 p-2 text-xs rounded-r-xl">
+                        <strong>Tag #${b.tag}</strong>: Unserviced (No Fali) for ${daysSinceIncoming} days since arrival.
+                    </div>`;
+                }
+
+                // Khali over 30 days dashboard tracker alert check
+                if (b.status === 'Khali' && !b.fali && daysSinceIncoming > 30 && b.type !== 'Bull') {
+                    alertsHTML += `<div class="bg-amber-50 border-l-4 border-amber-400 p-2 text-xs rounded-r-xl">
+                        <strong>Tag #${b.tag}</strong>: Registered Khali and empty on feed management over 30 days.
+                    </div>`;
+                }
+
+                // Pregnancy milestones metric aggregations
+                if (b.fali) {
+                    // Dr Pregnancy Test criteria: >60 days post fali if not marked pregnant/khali explicitly yet
+                    if (daysSinceFali >= 60 && b.status === 'Khali') {
+                        dueForTest++;
+                    }
+                    // Pregnant rules
+                    if (b.status === 'Pregnant') {
+                        // 7 months threshold = ~210 days
+                        if (daysSinceFali >= 210) pregnantOver7M++;
+                        // Gestation birth window: 10 months = ~300 days
+                        if (daysSinceFali >= 270 && daysSinceFali <= 310) dueForBirth++;
+                    }
+                }
+
+                // Context Color classes mappings
+                let statusBadgeClass = "badge-khali";
+                let statusText = b.status;
+                if(b.status === 'Pregnant') statusBadgeClass = "badge-pregnant";
+                if(b.status === 'Returned') statusBadgeClass = "badge-returned";
+
+                // Generate Herd List card layout outputs
+                recordsHTML += `
+                <div class="${alertUnserviced ? 'bg-amber-50 border-2 border-amber-300' : 'bg-white'} p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between space-y-2 relative">
+                    <button onclick="deleteRecord(${b.id})" class="absolute top-3 right-3 text-gray-300 hover:text-red-600 p-1 text-sm">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <span class="text-base font-extrabold text-gray-900">Tag #${b.tag}</span>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full font-bold ${statusBadgeClass}">${statusText}</span>
+                        <span class="text-xs text-gray-400 font-mono">Khila: ${b.khila || 'N/A'}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-gray-600">
+                        <div><span class="text-gray-400">Loc:</span> ${b.shed}</div>
+                        <div><span class="text-gray-400">In:</span> ${b.incoming || '--'}</div>
+                        <div><span class="text-gray-400">Fali:</span> ${b.fali || 'Not Set'}</div>
+                        <div><span class="text-gray-400">Bull:</span> ${b.bull || '--'}</div>
+                    </div>
+                    ${b.palak !== 'None' ? `<div class="text-[11px] bg-gray-50 p-1.5 rounded-lg text-gray-500">Palak: <b>${b.palak}</b> | Out: ${b.outDate || '--'} | Ret: ${b.returnDate || 'In Guj'}</div>` : ''}
+                </div>`;
+
+                // Handle Palak financial accounting allocations logic rules
+                if(b.palak !== 'None') {
+                    let cost = 0;
+                    let daysStayed = 0;
+                    let statusLabel = "";
+
+                    if (b.outDate && b.returnDate) {
+                        daysStayed = getDaysBetween(b.outDate, b.returnDate);
+                        const dailyRate = MONTHLY_RATES[b.palak] / 30;
+                        cost = Math.round(daysStayed * dailyRate);
+                        statusLabel = `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">Returned to Mumbai</span>`;
+                        
+                        if(b.palak === 'Tosif') { tosifTotalBill += cost; tosifCount++; }
+                        if(b.palak === 'Noora') { nooraTotalBill += cost; nooraCount++; }
+                    } else if(b.outDate && !b.returnDate) {
+                        statusLabel = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[10px] font-bold">Standing in Gujarat (No Charge)</span>`;
+                    }
+
+                    billingHTML += `
+                    <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-bold text-gray-900">Tag #${b.tag} (${b.palak})</span>
+                            <span class="text-sm font-black text-amber-900">₹${cost.toLocaleString()}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs text-gray-500">
+                            <span>Stay: ${daysStayed} days inside Mumbai</span>
+                            ${statusLabel}
+                        </div>
+                        <div class="text-[10px] text-gray-400">Timeline Logs: Out to Guj: ${b.outDate || '--'} ➔ Ret to Mum: ${b.returnDate || 'Pending'}</div>
+                    </div>`;
+                }
+            });
+
+            // Update DOM Header and Global numbers 
+            document.getElementById('header-count').innerText = `${totalBuffaloes + totalBulls} Head`;
+            document.getElementById('record-count').innerText = `Showing ${herd.length} entries`;
+            document.getElementById('dash-total-herd').innerText = totalBuffaloes + totalBulls;
+            document.getElementById('dash-pregnant-7m').innerText = pregnantOver7M;
+            document.getElementById('dash-due-test').innerText = dueForTest;
+            document.getElementById('dash-due-birth').innerText = dueForBirth;
+
+            // Render Warnings Dashboard alert block if metrics present
+            if(alertsHTML) {
+                document.getElementById('dashboard-critical-alerts').classList.remove('hidden');
+                document.getElementById('alerts-list').innerHTML = alertsHTML;
+            } else {
+                document.getElementById('dashboard-critical-alerts').classList.add('hidden');
+            }
+
+            // Calculations capacity percentage allocations bars logic
+            const s1Total = shed1MainBuff + shed1MainBulls + shed1Yard;
+            const s1Max = SHED_CAPACITIES["8/1"].mainMax + SHED_CAPACITIES["8/1"].yardMax;
+            const s1Pct = Math.min((s1Total / s1Max) * 100, 100);
+            document.getElementById('shed-1-status').innerText = `${s1Total} / ${s1Max} Khilas`;
+            document.getElementById('shed-1-bar').style.width = `${s1Pct}%`;
+            document.getElementById('shed-1-sub').innerText = `${shed1MainBuff} Buffaloes | ${shed1MainBulls} Bulls | Yard: ${shed1Yard}/${SHED_CAPACITIES["8/1"].yardMax}`;
+
+            const s2Total = shed2MainBuff + shed2MainBulls + shed2Yard;
+            const s2Max = SHED_CAPACITIES["8/2"].mainMax + SHED_CAPACITIES["8/2"].yardMax;
+            const s2Pct = Math.min((s2Total / s2Max) * 100, 100);
+            document.getElementById('shed-2-status').innerText = `${s2Total} / ${s2Max} Khilas`;
+            document.getElementById('shed-2-bar').style.width = `${s2Pct}%`;
+            document.getElementById('shed-2-sub').innerText = `${shed2MainBuff} Buffaloes | ${shed2MainBulls} Bulls | Yard: ${shed2Yard}/${SHED_CAPACITIES["8/2"].yardMax}`;
+
+            // Inject Lists views outputs
+            document.getElementById('herd-list-container').innerHTML = recordsHTML || `<p class="text-center text-xs text-gray-400 py-6">No data registered yet.</p>`;
+            document.getElementById('billing-list-container').innerHTML = billingHTML || `<p class="text-center text-xs text-gray-400 py-6">No active Palak transits cataloged.</p>`;
+
+            // Invoicing summary blocks displays
+            document.getElementById('bill-tosif-total').innerText = `₹${tosifTotalBill.toLocaleString()}`;
+            document.getElementById('bill-tosif-count').innerText = `${tosifCount} Stays Charged`;
+            document.getElementById('bill-noora-total').innerText = `₹${nooraTotalBill.toLocaleString()}`;
+            document.getElementById('bill-noora-count').innerText = `${nooraCount} Stays Charged`;
+        }
+
+        // Initialize App on startup entrypoint load
+        window.onload = function() {
+            renderApp();
+        };
+    </script>
+</body>
+</html>
